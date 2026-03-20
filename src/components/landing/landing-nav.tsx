@@ -63,6 +63,24 @@ export function LandingNav() {
           ))}
         </nav>
         <div className="flex items-center gap-3">
+          <a
+            href="https://www.youtube.com/watch?v=tFc8AvYqPXo"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Button
+              variant="ghost"
+              size="sm"
+              className={cn(
+                "transition-colors duration-500",
+                scrolled
+                  ? "text-slate-300 hover:bg-white/10 hover:text-white"
+                  : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-white/10 dark:hover:text-white"
+              )}
+            >
+              Demo Video
+            </Button>
+          </a>
           <Link href="/login">
             <Button
               variant="ghost"
