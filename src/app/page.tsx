@@ -163,8 +163,8 @@ export default function LandingPage() {
             {[
               { value: "15 min", label: "Average time to first insight" },
               {
-                value: "23%",
-                label: "Average margin improvement identified",
+                value: "10+",
+                label: "AI-powered analysis features",
               },
               { value: "6+", label: "Actionable items per report" },
               { value: "24/7", label: "AI consultant availability" },
