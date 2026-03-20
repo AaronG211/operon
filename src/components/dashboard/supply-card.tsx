@@ -101,9 +101,9 @@ export function SupplyCard({ data }: Props) {
                       )}
                       <Badge
                         variant="outline"
-                        className={`shrink-0 text-[10px] ${pricingColor[supplier.estimated_pricing] || ""}`}
+                        className={`shrink-0 text-[10px] ${pricingColor[supplier.estimated_pricing ?? ""] || ""}`}
                       >
-                        {supplier.estimated_pricing}
+                        {supplier.estimated_pricing ?? "Unknown"}
                       </Badge>
                     </div>
                     <div className="mt-0.5 flex items-center gap-2 text-xs text-muted-foreground">

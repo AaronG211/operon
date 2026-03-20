@@ -104,7 +104,7 @@ export function TargetCustomerCard({ data }: Props) {
             </h4>
             <div className="grid gap-1.5 sm:grid-cols-2">
               {data.nearby_facilities.slice(0, 8).map((f, i) => {
-                const Icon = facilityIcons[f.type] || Building2;
+                const Icon = facilityIcons[f.type ?? ""] || Building2;
                 return (
                   <div
                     key={i}

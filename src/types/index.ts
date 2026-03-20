@@ -87,9 +87,9 @@ export interface ChatMessage {
 // AI Response Types
 export interface CompetitorInfo {
   name: string;
-  distance: string;
-  cuisine: string;
-  price_range: string;
+  distance: string | null;
+  cuisine: string | null;
+  price_range: string | null;
   rating: number | null;
   review_count: number | null;
   strengths: string[];
@@ -110,20 +110,20 @@ export interface CompetitorAnalysis {
 export interface TargetCustomerAnalysis {
   demographics: {
     primary_segments: string[];
-    income_level: string;
-    analysis: string;
+    income_level: string | null;
+    analysis: string | null;
   };
   foot_traffic: {
     peak_times: string[];
-    patterns: string;
+    patterns: string | null;
     nearby_drivers: string[];
   };
   nearby_facilities: {
     name: string;
-    type: string;
-    estimated_impact: string;
+    type: string | null;
+    estimated_impact: string | null;
   }[];
-  customer_profile: string;
+  customer_profile: string | null;
   underserved_needs: string[];
 }
 
@@ -131,20 +131,20 @@ export interface SupplyRecommendation {
   ingredient_categories: {
     category: string;
     key_items: string[];
-    estimated_weekly_volume: string;
+    estimated_weekly_volume: string | null;
   }[];
   recommended_suppliers: {
     name: string;
-    type: string;
-    distance: string;
+    type: string | null;
+    distance: string | null;
     specialties: string[];
-    estimated_pricing: string;
-    website_or_contact: string;
-    why_recommended: string;
+    estimated_pricing: string | null;
+    website_or_contact: string | null;
+    why_recommended: string | null;
     menu_items_served: string[];
   }[];
   cost_saving_tips: string[];
-  sourcing_strategy: string;
+  sourcing_strategy: string | null;
 }
 
 export interface HealthCheckSummary {

@@ -1,12 +1,7 @@
-import {
-  GoogleGenerativeAI,
-  type GoogleSearchRetrievalTool,
-} from "@google/generative-ai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
-const groundingTools: GoogleSearchRetrievalTool[] = [
-  { googleSearchRetrieval: {} },
-];
+const groundingTools = [{ googleSearch: {} }] as any;
 
 export function getModel() {
   const modelName = process.env.GEMINI_MODEL || "gemini-2.0-flash";

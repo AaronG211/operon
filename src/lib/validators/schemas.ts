@@ -94,14 +94,14 @@ export const competitorAnalysisSchema = z.object({
   competitors: z.array(
     z.object({
       name: z.string(),
-      distance: z.string(),
-      cuisine: z.string(),
-      price_range: z.string(),
+      distance: z.string().nullable().default("Unknown"),
+      cuisine: z.string().nullable().default("Unknown"),
+      price_range: z.string().nullable().default("Unknown"),
       rating: z.number().nullable(),
       review_count: z.number().nullable(),
-      strengths: z.array(z.string()),
-      weaknesses: z.array(z.string()),
-      menu_highlights: z.array(z.string()),
+      strengths: z.array(z.string()).default([]),
+      weaknesses: z.array(z.string()).default([]),
+      menu_highlights: z.array(z.string()).default([]),
       estimated_avg_price: z.number().nullable(),
     })
   ),
@@ -114,48 +114,48 @@ export const competitorAnalysisSchema = z.object({
 
 export const targetCustomerAnalysisSchema = z.object({
   demographics: z.object({
-    primary_segments: z.array(z.string()),
-    income_level: z.string(),
-    analysis: z.string(),
+    primary_segments: z.array(z.string()).default([]),
+    income_level: z.string().nullable().default("Unknown"),
+    analysis: z.string().nullable().default(""),
   }),
   foot_traffic: z.object({
-    peak_times: z.array(z.string()),
-    patterns: z.string(),
-    nearby_drivers: z.array(z.string()),
+    peak_times: z.array(z.string()).default([]),
+    patterns: z.string().nullable().default(""),
+    nearby_drivers: z.array(z.string()).default([]),
   }),
   nearby_facilities: z.array(
     z.object({
       name: z.string(),
-      type: z.string(),
-      estimated_impact: z.string(),
+      type: z.string().nullable().default("Unknown"),
+      estimated_impact: z.string().nullable().default("Unknown"),
     })
-  ),
-  customer_profile: z.string(),
-  underserved_needs: z.array(z.string()),
+  ).default([]),
+  customer_profile: z.string().nullable().default(""),
+  underserved_needs: z.array(z.string()).default([]),
 });
 
 export const supplyRecommendationSchema = z.object({
   ingredient_categories: z.array(
     z.object({
       category: z.string(),
-      key_items: z.array(z.string()),
-      estimated_weekly_volume: z.string(),
+      key_items: z.array(z.string()).default([]),
+      estimated_weekly_volume: z.string().nullable().default("Unknown"),
     })
-  ),
+  ).default([]),
   recommended_suppliers: z.array(
     z.object({
       name: z.string(),
-      type: z.string(),
-      distance: z.string(),
-      specialties: z.array(z.string()),
-      estimated_pricing: z.string(),
-      website_or_contact: z.string(),
-      why_recommended: z.string(),
-      menu_items_served: z.array(z.string()),
+      type: z.string().nullable().default("Unknown"),
+      distance: z.string().nullable().default("Unknown"),
+      specialties: z.array(z.string()).default([]),
+      estimated_pricing: z.string().nullable().default("Unknown"),
+      website_or_contact: z.string().nullable().default(""),
+      why_recommended: z.string().nullable().default(""),
+      menu_items_served: z.array(z.string()).default([]),
     })
-  ),
-  cost_saving_tips: z.array(z.string()),
-  sourcing_strategy: z.string(),
+  ).default([]),
+  cost_saving_tips: z.array(z.string()).default([]),
+  sourcing_strategy: z.string().nullable().default(""),
 });
 
 export type RestaurantInput = z.infer<typeof restaurantSchema>;
