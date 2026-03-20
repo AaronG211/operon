@@ -64,7 +64,7 @@ export function LandingNav() {
         </nav>
         <div className="flex items-center gap-3">
           <a
-            href="https://www.youtube.com/watch?v=tFc8AvYqPXo"
+            href="https://www.youtube.com/watch?v=tFc8AvYqPX0"
             target="_blank"
             rel="noopener noreferrer"
           >
