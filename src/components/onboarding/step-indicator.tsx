@@ -5,8 +5,8 @@ import { Check } from "lucide-react";
 
 const steps = [
   "Restaurant Info",
-  "Business Metrics",
   "Menu Data",
+  "Cost & Revenue",
   "Reviews",
   "Confirm",
 ];

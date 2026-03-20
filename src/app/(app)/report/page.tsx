@@ -1,6 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-import type { Report } from "@/types";
 
 export const dynamic = "force-dynamic";
 

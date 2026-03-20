@@ -4,7 +4,7 @@ export const restaurantSchema = z.object({
   name: z.string().min(1, "Restaurant name is required").max(200),
   cuisine_type: z.string().optional().default(""),
   location: z.string().optional().default(""),
-  service_model: z.enum(["dine_in", "takeout", "delivery", "hybrid"]),
+  service_model: z.string().min(1, "Select at least one service model"),
   seats: z.coerce.number().int().positive().optional().nullable(),
   hours: z.string().optional().default(""),
 });
@@ -25,8 +25,8 @@ export const menuItemSchema = z.object({
   item_name: z.string().min(1, "Item name is required"),
   category: z.string().optional().default(""),
   price: z.coerce.number().positive("Price must be positive"),
-  estimated_cost: z.coerce.number().nonnegative().nullable(),
-  quantity_sold: z.coerce.number().int().nonnegative().nullable(),
+  estimated_cost: z.coerce.number().nonnegative().nullable().optional(),
+  quantity_sold: z.coerce.number().int().nonnegative().nullable().optional(),
 });
 
 export const reviewSchema = z.object({
@@ -65,6 +65,7 @@ export const healthCheckResponseSchema = z.object({
       title: z.string(),
       description: z.string(),
       severity: z.enum(["high", "medium", "low"]),
+      data_source: z.string(),
     })
   ),
   opportunities: z.array(
@@ -72,6 +73,7 @@ export const healthCheckResponseSchema = z.object({
       title: z.string(),
       description: z.string(),
       potential_impact: z.string(),
+      data_source: z.string(),
     })
   ),
   recommendations: z.array(
@@ -83,8 +85,77 @@ export const healthCheckResponseSchema = z.object({
       priority: z.enum(["high", "medium", "low"]),
       effort: z.enum(["low", "medium", "high"]),
       impact: z.string(),
+      data_source: z.string(),
     })
   ),
+});
+
+export const competitorAnalysisSchema = z.object({
+  competitors: z.array(
+    z.object({
+      name: z.string(),
+      distance: z.string(),
+      cuisine: z.string(),
+      price_range: z.string(),
+      rating: z.number().nullable(),
+      review_count: z.number().nullable(),
+      strengths: z.array(z.string()),
+      weaknesses: z.array(z.string()),
+      menu_highlights: z.array(z.string()),
+      estimated_avg_price: z.number().nullable(),
+    })
+  ),
+  landscape_summary: z.string(),
+  pricing_position: z.enum(["below_market", "at_market", "above_market"]),
+  pricing_analysis: z.string(),
+  differentiation_gaps: z.array(z.string()),
+  competitive_advantages: z.array(z.string()),
+});
+
+export const targetCustomerAnalysisSchema = z.object({
+  demographics: z.object({
+    primary_segments: z.array(z.string()),
+    income_level: z.string(),
+    analysis: z.string(),
+  }),
+  foot_traffic: z.object({
+    peak_times: z.array(z.string()),
+    patterns: z.string(),
+    nearby_drivers: z.array(z.string()),
+  }),
+  nearby_facilities: z.array(
+    z.object({
+      name: z.string(),
+      type: z.string(),
+      estimated_impact: z.string(),
+    })
+  ),
+  customer_profile: z.string(),
+  underserved_needs: z.array(z.string()),
+});
+
+export const supplyRecommendationSchema = z.object({
+  ingredient_categories: z.array(
+    z.object({
+      category: z.string(),
+      key_items: z.array(z.string()),
+      estimated_weekly_volume: z.string(),
+    })
+  ),
+  recommended_suppliers: z.array(
+    z.object({
+      name: z.string(),
+      type: z.string(),
+      distance: z.string(),
+      specialties: z.array(z.string()),
+      estimated_pricing: z.string(),
+      website_or_contact: z.string(),
+      why_recommended: z.string(),
+      menu_items_served: z.array(z.string()),
+    })
+  ),
+  cost_saving_tips: z.array(z.string()),
+  sourcing_strategy: z.string(),
 });
 
 export type RestaurantInput = z.infer<typeof restaurantSchema>;
@@ -93,4 +164,8 @@ export type MenuItemInput = z.infer<typeof menuItemSchema>;
 export type ReviewInput = z.infer<typeof reviewSchema>;
 export type HealthCheckResponseInput = z.infer<
   typeof healthCheckResponseSchema
+>;
+export type CompetitorAnalysisInput = z.infer<typeof competitorAnalysisSchema>;
+export type TargetCustomerAnalysisInput = z.infer<
+  typeof targetCustomerAnalysisSchema
 >;

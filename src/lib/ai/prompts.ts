@@ -5,12 +5,35 @@ import type {
   Review,
   Report,
   Recommendation,
+  CompetitorAnalysis,
+  TargetCustomerAnalysis,
 } from "@/types";
+import type { NearbyCompetitor } from "@/lib/google/places";
 
-export function buildHealthCheckSystemPrompt(): string {
+export function buildHealthCheckSystemPrompt(
+  competitionData?: CompetitorAnalysis | null,
+  targetCustomerData?: TargetCustomerAnalysis | null
+): string {
+  let locationContext = "";
+
+  if (competitionData) {
+    locationContext += `\n\nYou also have COMPETITION ANALYSIS data. Use it to make recommendations about pricing relative to competitors, menu differentiation, and competitive positioning. Reference specific competitor names and their prices/ratings.
+
+=== COMPETITION ANALYSIS ===
+${JSON.stringify(competitionData, null, 2)}`;
+  }
+
+  if (targetCustomerData) {
+    locationContext += `\n\nYou also have TARGET CUSTOMER ANALYSIS data. Use it to make recommendations about marketing, menu offerings, hours, and service model based on the local demographics, foot traffic, and nearby facilities. Reference specific facilities and customer segments.
+
+=== TARGET CUSTOMER ANALYSIS ===
+${JSON.stringify(targetCustomerData, null, 2)}`;
+  }
+
   return `You are an expert restaurant business consultant with deep experience in restaurant operations, profitability optimization, menu engineering, and customer experience.
 
 You will receive data about a restaurant including financial metrics, menu performance, and customer reviews. Your job is to produce a thorough, specific business health check.
+${locationContext}
 
 You MUST respond with valid JSON matching this exact structure:
 {
@@ -36,10 +59,10 @@ You MUST respond with valid JSON matching this exact structure:
     "analysis": "detailed analysis paragraph"
   },
   "risks": [
-    {"title": "risk title", "description": "detailed description", "severity": "high" | "medium" | "low"}
+    {"title": "risk title", "description": "detailed description", "severity": "high" | "medium" | "low", "data_source": "Reviews" | "Cost & Revenue" | "Menu" | "Competition" | "Target Customers" | "Local Supply"}
   ],
   "opportunities": [
-    {"title": "opportunity title", "description": "detailed description", "potential_impact": "expected impact"}
+    {"title": "opportunity title", "description": "detailed description", "potential_impact": "expected impact", "data_source": "Reviews" | "Cost & Revenue" | "Menu" | "Competition" | "Target Customers" | "Local Supply"}
   ],
   "recommendations": [
     {
@@ -49,7 +72,8 @@ You MUST respond with valid JSON matching this exact structure:
       "category": "quick_win" | "operational" | "strategic",
       "priority": "high" | "medium" | "low",
       "effort": "low" | "medium" | "high",
-      "impact": "expected business impact"
+      "impact": "expected business impact",
+      "data_source": "Reviews" | "Cost & Revenue" | "Menu" | "Competition" | "Target Customers" | "Local Supply"
     }
   ]
 }
@@ -58,6 +82,7 @@ Rules:
 - Every insight MUST reference specific data from the restaurant (exact numbers, item names, review quotes).
 - Provide 3-5 risks, 3-5 opportunities, and 5-10 recommendations.
 - Recommendations must be concrete and actionable, not generic advice.
+- Every risk, opportunity, and recommendation MUST include a "data_source" field indicating the PRIMARY data source that led to this insight. Use exactly one of: "Reviews", "Cost & Revenue", "Menu", "Competition", "Target Customers", or "Local Supply". Pick the single most relevant source.${competitionData ? "\n- Include 2-3 recommendations specifically about competitive positioning, pricing vs competitors, and menu differentiation." : ""}${targetCustomerData ? "\n- Include 2-3 recommendations specifically about targeting local customer segments, adjusting for foot traffic patterns, and marketing to nearby facilities." : ""}
 - If data is insufficient for a section, say so honestly rather than making assumptions.
 - Do not invent data that was not provided.`;
 }
@@ -71,7 +96,7 @@ export function buildHealthCheckUserPrompt(
   let prompt = `Restaurant: ${restaurant.name}`;
   if (restaurant.cuisine_type) prompt += `, ${restaurant.cuisine_type}`;
   if (restaurant.location) prompt += `, ${restaurant.location}`;
-  prompt += `\nService model: ${restaurant.service_model}`;
+  prompt += `\nService model: ${restaurant.service_model?.split(",").join(", ") ?? "Not specified"}`;
   if (restaurant.seats) prompt += `, Seats: ${restaurant.seats}`;
   if (restaurant.hours) prompt += `\nHours: ${restaurant.hours}`;
 
@@ -133,6 +158,300 @@ export function buildHealthCheckUserPrompt(
   return prompt;
 }
 
+// ─── Competition Analysis Prompts ─────────────────────────────────────────
+
+export function buildCompetitionGroundingSystemPrompt(): string {
+  return `You are a competitive intelligence analyst specializing in the restaurant industry. Your job is to research nearby competing restaurants and provide detailed intelligence about each one.
+
+For each competitor, try to find:
+- What type of cuisine they serve and their specialty dishes
+- Their menu items and approximate pricing
+- Their Google rating, review count, and what customers say about them
+- Their strengths (what they're known for) and weaknesses (common complaints)
+- Their price range and positioning
+
+Also analyze the overall competitive landscape: how saturated is the area, what cuisines are over/under-represented, and where are the gaps.
+
+Be thorough and factual. Clearly state when you're estimating vs. using confirmed data.`;
+}
+
+export function buildCompetitionGroundingUserPrompt(
+  restaurant: Restaurant,
+  nearbyPlaces: NearbyCompetitor[],
+  menuItems: MenuItem[]
+): string {
+  let prompt = `I need competitive intelligence for my restaurant:
+- Name: ${restaurant.name}
+- Cuisine: ${restaurant.cuisine_type || "Not specified"}
+- Location: ${restaurant.location || "Not specified"}
+- Service: ${restaurant.service_model?.split(",").join(", ") || "Not specified"}`;
+
+  if (menuItems.length > 0) {
+    const avgPrice =
+      menuItems.reduce((sum, m) => sum + m.price, 0) / menuItems.length;
+    prompt += `\n- My avg menu price: $${avgPrice.toFixed(2)}`;
+    prompt += `\n- My menu items: ${menuItems.slice(0, 10).map((m) => `${m.item_name} ($${m.price})`).join(", ")}`;
+  }
+
+  if (nearbyPlaces.length > 0) {
+    prompt += `\n\nNearby restaurants found via Google Maps (within 1.5km):`;
+    nearbyPlaces.forEach((p, i) => {
+      prompt += `\n${i + 1}. ${p.name} — ${p.address}`;
+      if (p.rating) prompt += ` | Rating: ${p.rating}/5`;
+      if (p.userRatingCount) prompt += ` (${p.userRatingCount} reviews)`;
+      if (p.priceLevel) prompt += ` | Price: ${p.priceLevel}`;
+    });
+    prompt += `\n\nPlease search the web for detailed info about each of these competitors — their menus, pricing, reviews, and reputation. Then analyze how my restaurant competes.`;
+  } else {
+    prompt += `\n\nPlease search the web for restaurants near ${restaurant.location || "this location"} and analyze the competitive landscape for a ${restaurant.cuisine_type || ""} restaurant.`;
+  }
+
+  return prompt;
+}
+
+export function buildCompetitionExtractionSystemPrompt(): string {
+  return `You are a data extraction specialist. Extract structured competitive analysis data from the research text provided.
+
+You MUST respond with valid JSON matching this exact structure:
+{
+  "competitors": [
+    {
+      "name": "restaurant name",
+      "distance": "approximate distance, e.g. '0.3 miles'",
+      "cuisine": "cuisine type",
+      "price_range": "$ / $$ / $$$ / $$$$",
+      "rating": 4.2,
+      "review_count": 150,
+      "strengths": ["strength 1", "strength 2"],
+      "weaknesses": ["weakness 1"],
+      "menu_highlights": ["dish 1 ($X)", "dish 2 ($Y)"],
+      "estimated_avg_price": 15.99
+    }
+  ],
+  "landscape_summary": "2-3 sentence summary of the competitive landscape",
+  "pricing_position": "below_market" | "at_market" | "above_market",
+  "pricing_analysis": "How the restaurant's pricing compares to competitors",
+  "differentiation_gaps": ["gap 1", "gap 2"],
+  "competitive_advantages": ["advantage 1", "advantage 2"]
+}
+
+Rules:
+- Include up to 8 most relevant competitors
+- Use null for unknown numeric values
+- Be specific with pricing comparisons
+- Base pricing_position on actual menu price comparisons when available`;
+}
+
+export function buildCompetitionExtractionUserPrompt(
+  groundedText: string,
+  restaurant: Restaurant,
+  menuItems: MenuItem[]
+): string {
+  let prompt = `Extract structured competitive analysis from this research about competitors near "${restaurant.name}" (${restaurant.cuisine_type || "restaurant"}) at ${restaurant.location || "unknown location"}.`;
+
+  if (menuItems.length > 0) {
+    const avgPrice =
+      menuItems.reduce((sum, m) => sum + m.price, 0) / menuItems.length;
+    prompt += `\n\nOur average menu price: $${avgPrice.toFixed(2)}`;
+  }
+
+  prompt += `\n\n=== RESEARCH DATA ===\n${groundedText}`;
+
+  return prompt;
+}
+
+// ─── Target Customer Analysis Prompts ─────────────────────────────────────
+
+export function buildTargetCustomerGroundingSystemPrompt(): string {
+  return `You are a market research analyst specializing in restaurant location analysis. Your job is to research a specific geographic area and build a target customer profile for a restaurant.
+
+Research and provide:
+1. Demographics: What types of people live/work in this area? Income levels, age distribution, household types
+2. Nearby facilities: What businesses, schools, offices, shopping centers, transit stops, entertainment venues, hospitals are nearby?
+3. Foot traffic patterns: When is this area busiest? What drives foot traffic (commuters, shoppers, students, tourists)?
+4. Economic indicators: What is the general spending power and dining-out frequency of people in this area?
+
+Be thorough and factual. Use census data, local business directories, and any available information about the area.`;
+}
+
+export function buildTargetCustomerGroundingUserPrompt(
+  restaurant: Restaurant
+): string {
+  return `Research the area around this restaurant for target customer analysis:
+- Restaurant: ${restaurant.name}
+- Cuisine: ${restaurant.cuisine_type || "Not specified"}
+- Location: ${restaurant.location || "Not specified"}
+- Coordinates: ${restaurant.latitude}, ${restaurant.longitude}
+- Service model: ${restaurant.service_model?.split(",").join(", ") || "Not specified"}
+- Seats: ${restaurant.seats ?? "Not specified"}
+
+Please search the web for:
+1. Demographics of the neighborhood/area (income, age, population density)
+2. Notable businesses, offices, schools, universities within 1 mile
+3. Shopping centers, entertainment venues, transit stations nearby
+4. Foot traffic patterns and peak hours for this area
+5. General dining trends and preferences in this neighborhood`;
+}
+
+export function buildTargetCustomerExtractionSystemPrompt(): string {
+  return `You are a data extraction specialist. Extract structured target customer analysis from the research text provided.
+
+You MUST respond with valid JSON matching this exact structure:
+{
+  "demographics": {
+    "primary_segments": ["segment 1", "segment 2", "segment 3"],
+    "income_level": "low / middle / upper-middle / high / mixed",
+    "analysis": "2-3 sentence demographic analysis"
+  },
+  "foot_traffic": {
+    "peak_times": ["weekday lunch 11:30-1:30", "friday/saturday dinner 6-9pm"],
+    "patterns": "Description of foot traffic patterns",
+    "nearby_drivers": ["driver 1 — estimated daily visitors", "driver 2"]
+  },
+  "nearby_facilities": [
+    {"name": "facility name", "type": "office|school|shopping|transit|residential|entertainment|medical", "estimated_impact": "how it affects the restaurant"}
+  ],
+  "customer_profile": "2-3 sentence ideal customer profile for this restaurant at this location",
+  "underserved_needs": ["need 1", "need 2", "need 3"]
+}
+
+Rules:
+- Be specific with facility names and types
+- Include at least 5-10 nearby facilities
+- Foot traffic peak_times should be specific time ranges
+- Underserved needs should be actionable opportunities`;
+}
+
+export function buildTargetCustomerExtractionUserPrompt(
+  groundedText: string,
+  restaurant: Restaurant
+): string {
+  return `Extract structured target customer analysis from this research about the area around "${restaurant.name}" (${restaurant.cuisine_type || "restaurant"}) at ${restaurant.location || "unknown location"}.
+
+=== RESEARCH DATA ===
+${groundedText}`;
+}
+
+// ─── Local Supply Recommendation Prompts ──────────────────────────────────
+
+export function buildSupplyGroundingSystemPrompt(): string {
+  return `You are a restaurant supply chain specialist. Your job is to research local food suppliers, distributors, wholesalers, and farmers markets near a restaurant location.
+
+For each potential supplier, try to find:
+- Their exact name and what they supply (produce, proteins, dairy, dry goods, specialty items, etc.)
+- Their location / distance from the restaurant
+- Whether they offer delivery, minimum order requirements, and pricing tier
+- Their reputation and what restaurants they typically serve
+- Contact information or website
+
+Also consider:
+- Local farmers markets and their schedules
+- Restaurant-specific wholesalers (Sysco, US Foods, Restaurant Depot, local alternatives)
+- Specialty suppliers for the specific cuisine type
+- Direct-from-farm options for freshness and cost savings
+
+Be thorough and factual. Clearly state when you're estimating vs. using confirmed data.`;
+}
+
+export function buildSupplyGroundingUserPrompt(
+  restaurant: Restaurant,
+  menuItems: MenuItem[]
+): string {
+  let prompt = `I need local supply chain recommendations for my restaurant:
+- Name: ${restaurant.name}
+- Cuisine: ${restaurant.cuisine_type || "Not specified"}
+- Location: ${restaurant.location || "Not specified"}
+- Coordinates: ${restaurant.latitude}, ${restaurant.longitude}
+- Service: ${restaurant.service_model?.split(",").join(", ") || "Not specified"}
+- Seats: ${restaurant.seats ?? "Not specified"}`;
+
+  if (menuItems.length > 0) {
+    prompt += `\n\nOur menu items (used to determine ingredient needs):`;
+    const categories = new Map<string, MenuItem[]>();
+    menuItems.forEach((m) => {
+      const cat = m.category || "Other";
+      if (!categories.has(cat)) categories.set(cat, []);
+      categories.get(cat)!.push(m);
+    });
+    categories.forEach((items, cat) => {
+      prompt += `\n  ${cat}: ${items.map((m) => m.item_name).join(", ")}`;
+    });
+  }
+
+  prompt += `\n\nPlease search the web for:
+1. Food distributors and wholesalers that deliver to ${restaurant.location || "this area"}
+2. Local farmers markets near the restaurant
+3. Specialty suppliers for ${restaurant.cuisine_type || "restaurant"} cuisine ingredients
+4. Produce, protein, dairy, and dry goods suppliers in the area
+5. Any restaurant supply stores (e.g., Restaurant Depot) nearby`;
+
+  return prompt;
+}
+
+export function buildSupplyExtractionSystemPrompt(): string {
+  return `You are a data extraction specialist. Extract structured local supply recommendations from the research text provided.
+
+You MUST respond with valid JSON matching this exact structure:
+{
+  "ingredient_categories": [
+    {
+      "category": "Proteins / Produce / Dairy / Dry Goods / Specialty / Beverages",
+      "key_items": ["ingredient 1", "ingredient 2"],
+      "estimated_weekly_volume": "e.g. 50-100 lbs, 20 cases"
+    }
+  ],
+  "recommended_suppliers": [
+    {
+      "name": "supplier name",
+      "type": "Wholesale / Farm Direct / Specialty / Distributor / Market",
+      "distance": "approximate distance from restaurant",
+      "specialties": ["what they're known for"],
+      "estimated_pricing": "Budget / Competitive / Premium",
+      "website_or_contact": "full website URL starting with https:// — always try to provide one",
+      "why_recommended": "why this supplier is a good fit for this restaurant",
+      "menu_items_served": ["Pad Thai", "Green Curry"]
+    }
+  ],
+  "cost_saving_tips": ["tip 1", "tip 2", "tip 3"],
+  "sourcing_strategy": "2-3 sentence overall sourcing strategy recommendation"
+}
+
+Rules:
+- Recommend 5-10 suppliers, prioritizing local and cost-effective options
+- Include at least one option per major ingredient category
+- Cost saving tips should be specific and actionable
+- Estimate weekly volumes based on restaurant size (seats) and menu complexity
+- Include a mix of large distributors and local/specialty options
+- IMPORTANT: For "website_or_contact", always provide a full URL (https://...) when available. Only use a phone number as a last resort.
+- IMPORTANT: For "menu_items_served", list the specific menu items from the restaurant's menu that this supplier's products would be used in. Match against the actual menu item names provided. Each supplier should list all relevant menu items.`;
+}
+
+export function buildSupplyExtractionUserPrompt(
+  groundedText: string,
+  restaurant: Restaurant,
+  menuItems: MenuItem[]
+): string {
+  let prompt = `Extract structured local supply recommendations from this research for "${restaurant.name}" (${restaurant.cuisine_type || "restaurant"}) at ${restaurant.location || "unknown location"}.`;
+
+  if (restaurant.seats) {
+    prompt += `\nRestaurant seats: ${restaurant.seats}`;
+  }
+
+  if (menuItems.length > 0) {
+    prompt += `\nMenu has ${menuItems.length} items across categories: ${[...new Set(menuItems.map((m) => m.category || "Other"))].join(", ")}`;
+    prompt += `\n\nFull menu items (use these EXACT names in menu_items_served):`;
+    menuItems.forEach((m) => {
+      prompt += `\n- ${m.item_name}${m.category ? ` (${m.category})` : ""}`;
+    });
+  }
+
+  prompt += `\n\n=== RESEARCH DATA ===\n${groundedText}`;
+
+  return prompt;
+}
+
+// ─── Chat & Weekly Summary Prompts ────────────────────────────────────────
+
 export function buildChatSystemPrompt(
   restaurant: Restaurant,
   latestReport: Report | null,
@@ -144,7 +463,7 @@ export function buildChatSystemPrompt(
 Name: ${restaurant.name}
 Cuisine: ${restaurant.cuisine_type ?? "Not specified"}
 Location: ${restaurant.location ?? "Not specified"}
-Service Model: ${restaurant.service_model}
+Service Model: ${restaurant.service_model?.split(",").join(", ") ?? "Not specified"}
 Seats: ${restaurant.seats ?? "Not specified"}`;
 
   if (latestReport) {
@@ -156,6 +475,16 @@ ${JSON.stringify(latestReport.risks, null, 2)}
 
 === OPPORTUNITIES ===
 ${JSON.stringify(latestReport.opportunities, null, 2)}`;
+
+    // Include competition and target customer data if available
+    if (latestReport.summary.competition) {
+      prompt += `\n\n=== COMPETITION ANALYSIS ===
+${JSON.stringify(latestReport.summary.competition, null, 2)}`;
+    }
+    if (latestReport.summary.target_customers) {
+      prompt += `\n\n=== TARGET CUSTOMER ANALYSIS ===
+${JSON.stringify(latestReport.summary.target_customers, null, 2)}`;
+    }
   }
 
   if (recommendations.length > 0) {
@@ -170,6 +499,7 @@ ${JSON.stringify(latestReport.opportunities, null, 2)}`;
 - If asked about something not covered by the data, say so honestly.
 - Be concise but specific. Reference actual numbers and items.
 - If the user asks about implementing a recommendation, give step-by-step practical advice.
+- If the user asks about competitors or local customers, use the competition and target customer analysis data.
 - Do not make up data that was not provided.`;
 
   return prompt;

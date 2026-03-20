@@ -1,23 +1,34 @@
 "use client";
 
+import { useMemo } from "react";
+import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PlacesAutocomplete } from "@/components/shared/places-autocomplete";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  WeeklyHoursPicker,
+  parseHoursToSchedule,
+  scheduleToString,
+} from "@/components/shared/weekly-hours-picker";
+import type { WeeklySchedule } from "@/components/shared/weekly-hours-picker";
+import { CuisineSelect } from "@/components/shared/cuisine-select";
 
 interface RestaurantInfo {
   name: string;
   cuisine_type: string;
   location: string;
-  service_model: "dine_in" | "takeout" | "delivery" | "hybrid";
+  latitude: number | null;
+  longitude: number | null;
+  service_model: string; // comma-separated: "dine_in,takeout,delivery"
   seats: number | null;
   hours: string;
 }
+
+const SERVICE_OPTIONS = [
+  { value: "dine_in", label: "Dine-in" },
+  { value: "takeout", label: "Takeout" },
+  { value: "delivery", label: "Delivery" },
+] as const;
 
 interface Props {
   data: RestaurantInfo;
@@ -27,6 +38,19 @@ interface Props {
 export function RestaurantInfoStep({ data, onChange }: Props) {
   const update = (field: keyof RestaurantInfo, value: string | number | null) => {
     onChange({ ...data, [field]: value });
+  };
+
+  const weeklySchedule = useMemo(
+    () => parseHoursToSchedule(data.hours),
+    [data.hours]
+  );
+
+  const handleScheduleChange = (schedule: WeeklySchedule) => {
+    onChange({ ...data, hours: scheduleToString(schedule) });
+  };
+
+  const handlePlaceSelect = (location: string, lat: number, lng: number) => {
+    onChange({ ...data, location, latitude: lat, longitude: lng });
   };
 
   return (
@@ -49,38 +73,52 @@ export function RestaurantInfoStep({ data, onChange }: Props) {
         </div>
         <div className="space-y-2">
           <Label htmlFor="cuisine">Cuisine Type</Label>
-          <Input
-            id="cuisine"
+          <CuisineSelect
             value={data.cuisine_type}
-            onChange={(e) => update("cuisine_type", e.target.value)}
-            placeholder="e.g. Asian Fusion, Italian, Mexican"
+            onChange={(val) => update("cuisine_type", val)}
           />
         </div>
-        <div className="space-y-2">
+        <div className="space-y-2 md:col-span-2">
           <Label htmlFor="location">Location</Label>
-          <Input
+          <PlacesAutocomplete
             id="location"
             value={data.location}
-            onChange={(e) => update("location", e.target.value)}
-            placeholder="e.g. Downtown Seattle, WA"
+            onChange={(val) => update("location", val)}
+            onPlaceSelect={handlePlaceSelect}
+            placeholder="Search restaurant name or address..."
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="service_model">Service Model *</Label>
-          <Select
-            value={data.service_model}
-            onValueChange={(v) => v && update("service_model", v)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select service model" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="dine_in">Dine-in</SelectItem>
-              <SelectItem value="takeout">Takeout</SelectItem>
-              <SelectItem value="delivery">Delivery</SelectItem>
-              <SelectItem value="hybrid">Hybrid</SelectItem>
-            </SelectContent>
-          </Select>
+          <Label>Service Model *</Label>
+          <div className="flex flex-wrap gap-2">
+            {SERVICE_OPTIONS.map((opt) => {
+              const selected = data.service_model.split(",").filter(Boolean);
+              const isActive = selected.includes(opt.value);
+              return (
+                <button
+                  key={opt.value}
+                  type="button"
+                  onClick={() => {
+                    const next = isActive
+                      ? selected.filter((s) => s !== opt.value)
+                      : [...selected, opt.value];
+                    update("service_model", next.join(","));
+                  }}
+                  className={cn(
+                    "rounded-full border px-4 py-1.5 text-sm font-medium transition-colors",
+                    isActive
+                      ? "border-primary bg-primary text-primary-foreground"
+                      : "border-input bg-background text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                  )}
+                >
+                  {opt.label}
+                </button>
+              );
+            })}
+          </div>
+          {data.service_model === "" && (
+            <p className="text-xs text-muted-foreground">Select at least one</p>
+          )}
         </div>
         <div className="space-y-2">
           <Label htmlFor="seats">Number of Seats</Label>
@@ -94,15 +132,15 @@ export function RestaurantInfoStep({ data, onChange }: Props) {
             placeholder="e.g. 60"
           />
         </div>
-        <div className="space-y-2">
-          <Label htmlFor="hours">Opening Hours</Label>
-          <Input
-            id="hours"
-            value={data.hours}
-            onChange={(e) => update("hours", e.target.value)}
-            placeholder="e.g. Mon-Sat 11am-10pm"
-          />
-        </div>
+      </div>
+
+      {/* Weekly Hours Picker */}
+      <div className="space-y-2">
+        <Label>Opening Hours</Label>
+        <WeeklyHoursPicker
+          value={weeklySchedule}
+          onChange={handleScheduleChange}
+        />
       </div>
     </div>
   );

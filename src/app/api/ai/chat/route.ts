@@ -25,34 +25,41 @@ export async function POST(request: Request) {
       );
     }
 
+    // Verify ownership
+    const { data: ownedRestaurant } = await supabase
+      .from("restaurants")
+      .select("id")
+      .eq("id", restaurantId)
+      .eq("owner_id", user.id)
+      .single();
+
+    if (!ownedRestaurant) {
+      return NextResponse.json(
+        { error: "Restaurant not found" },
+        { status: 404 }
+      );
+    }
+
     const admin = createAdminClient();
 
     // Fetch context
-    const [
-      { data: restaurant },
-      { data: reports },
-      { data: recommendations },
-      { data: chatHistory },
-    ] = await Promise.all([
+    const [{ data: restaurant }, { data: reports }, { data: chatHistory }] =
+      await Promise.all([
       admin.from("restaurants").select("*").eq("id", restaurantId).single(),
       admin
         .from("reports")
         .select("*")
         .eq("restaurant_id", restaurantId)
+        .eq("report_type", "health_check")
         .order("created_at", { ascending: false })
         .limit(1),
-      admin
-        .from("recommendations")
-        .select("*")
-        .eq("restaurant_id", restaurantId)
-        .order("created_at", { ascending: false }),
       admin
         .from("chat_messages")
         .select("*")
         .eq("restaurant_id", restaurantId)
         .order("created_at", { ascending: true })
         .limit(20),
-    ]);
+      ]);
 
     if (!restaurant) {
       return NextResponse.json(
@@ -61,9 +68,18 @@ export async function POST(request: Request) {
       );
     }
 
+    const latestReport = (reports?.[0] as Report) ?? null;
+    const { data: recommendations } = latestReport
+      ? await admin
+          .from("recommendations")
+          .select("*")
+          .eq("report_id", latestReport.id)
+          .order("created_at", { ascending: false })
+      : { data: [] as Recommendation[] };
+
     const systemPrompt = buildChatSystemPrompt(
       restaurant as Restaurant,
-      (reports?.[0] as Report) ?? null,
+      latestReport,
       (recommendations ?? []) as Recommendation[]
     );
 

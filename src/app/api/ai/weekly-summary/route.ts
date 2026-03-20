@@ -29,6 +29,29 @@ export async function POST(request: Request) {
     }
 
     const { restaurantId } = await request.json();
+
+    if (!restaurantId) {
+      return NextResponse.json(
+        { error: "restaurantId is required" },
+        { status: 400 }
+      );
+    }
+
+    // Verify ownership
+    const { data: ownedRestaurant } = await supabase
+      .from("restaurants")
+      .select("id")
+      .eq("id", restaurantId)
+      .eq("owner_id", user.id)
+      .single();
+
+    if (!ownedRestaurant) {
+      return NextResponse.json(
+        { error: "Restaurant not found" },
+        { status: 404 }
+      );
+    }
+
     const admin = createAdminClient();
 
     const [

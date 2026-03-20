@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { useRestaurant } from "@/hooks/use-restaurant";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -30,65 +31,67 @@ export default function WeeklySummaryPage() {
   const [summary, setSummary] = useState<WeeklySummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
-  const [restaurantId, setRestaurantId] = useState<string | null>(null);
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
+  const { current: restaurant, loading: restaurantLoading } = useRestaurant();
 
-  useEffect(() => {
-    loadSummary();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  const restaurantId = restaurant?.id ?? null;
 
-  async function loadSummary() {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) return;
-
-    const { data: restaurants } = await supabase
-      .from("restaurants")
-      .select("id")
-      .eq("owner_id", user.id)
-      .order("created_at", { ascending: false })
-      .limit(1);
-
-    if (!restaurants?.length) {
+  const loadSummary = useCallback(async () => {
+    if (!restaurantId) {
+      setSummary(null);
       setLoading(false);
       return;
     }
 
-    setRestaurantId(restaurants[0].id);
+    setLoading(true);
+    setSummary(null);
 
     const { data: reports } = await supabase
       .from("reports")
       .select("*")
-      .eq("restaurant_id", restaurants[0].id)
+      .eq("restaurant_id", restaurantId)
       .eq("report_type", "weekly_summary")
       .order("created_at", { ascending: false })
       .limit(1);
 
     if (reports?.length) {
-      setSummary(reports[0].summary as unknown as WeeklySummary);
+      setSummary(reports[0].summary as WeeklySummary);
     }
     setLoading(false);
-  }
+  }, [restaurantId, supabase]);
 
-  async function generateSummary() {
+  const generateSummary = useCallback(async () => {
     if (!restaurantId) return;
+
     setGenerating(true);
+
     try {
       const res = await fetch("/api/ai/weekly-summary", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ restaurantId }),
       });
+
       if (res.ok) {
         const data = await res.json();
-        setSummary(data.summary);
+        setSummary(data.summary as WeeklySummary);
       }
     } catch (err) {
       console.error("Failed to generate weekly summary:", err);
     }
+
     setGenerating(false);
-  }
+  }, [restaurantId]);
+
+  useEffect(() => {
+    if (restaurantLoading) return;
+
+    const timeoutId = window.setTimeout(() => {
+      void loadSummary();
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [loadSummary, restaurantLoading]);
 
   if (loading) {
     return (

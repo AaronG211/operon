@@ -2,42 +2,42 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import { Check, AlertTriangle } from "lucide-react";
 import type { OnboardingData } from "@/types";
+import { getOnboardingAssessment } from "@/lib/restaurant-insights";
 
 interface Props {
   data: OnboardingData;
 }
 
 export function ConfirmationStep({ data }: Props) {
-  const metricsCount = data.metrics.filter((m) => m.period_start).length;
-  const menuCount = data.menuItems.filter((m) => m.item_name).length;
-  const reviewCount = data.reviews.filter((r) => r.review_text).length;
+  const assessment = getOnboardingAssessment(data);
 
   const items = [
     {
       label: "Restaurant",
       value: data.restaurant.name || "Not entered",
-      ok: !!data.restaurant.name,
-    },
-    {
-      label: "Business Metrics",
-      value: `${metricsCount} period(s)`,
-      ok: metricsCount > 0,
+      ok: assessment.hasRequiredBasics,
     },
     {
       label: "Menu Items",
-      value: `${menuCount} item(s)`,
-      ok: menuCount > 0,
+      value: `${assessment.validMenuItems} priced item(s)`,
+      ok: assessment.validMenuItems > 0,
+    },
+    {
+      label: "Cost and Revenue",
+      value: `${assessment.validMetrics} valid period(s)`,
+      ok: assessment.validMetrics > 0,
     },
     {
       label: "Reviews",
-      value: `${reviewCount} review(s)`,
-      ok: reviewCount > 0,
+      value: `${assessment.validReviews} review(s)`,
+      ok: assessment.validReviews > 0,
     },
   ];
 
-  const canProceed = items[0].ok && (items[1].ok || items[2].ok);
+  const canProceed = assessment.canGenerate;
 
   return (
     <div className="space-y-6">
@@ -74,21 +74,56 @@ export function ConfirmationStep({ data }: Props) {
         ))}
       </div>
 
+      <Card>
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <CardTitle className="text-base">Readiness Score</CardTitle>
+              <p className="text-sm text-muted-foreground">
+                {assessment.confidenceSummary}
+              </p>
+            </div>
+            <Badge variant={canProceed ? "default" : "secondary"}>
+              {assessment.confidenceLabel.toUpperCase()}
+            </Badge>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <Progress value={assessment.coveragePercent} className="h-2" />
+          <p className="text-sm text-muted-foreground">
+            Coverage {assessment.coveragePercent}% based on restaurant basics,
+            metrics, menu, and reviews.
+          </p>
+        </CardContent>
+      </Card>
+
       {!canProceed && (
         <div className="rounded-lg border border-destructive/50 bg-destructive/5 p-4">
-          <p className="text-sm text-destructive">
-            Please enter at least your restaurant name and some business metrics
-            or menu data to generate an analysis.
-          </p>
+          <div className="space-y-2">
+            <p className="text-sm text-destructive">
+              Finish the minimum path before generating analysis.
+            </p>
+            <ul className="list-disc pl-5 text-sm text-destructive">
+              {assessment.missingRequirements.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </div>
         </div>
       )}
 
       {canProceed && (
-        <div className="rounded-lg border border-primary/50 bg-primary/5 p-4">
+        <div className="rounded-lg border border-primary/50 bg-primary/5 p-4 space-y-2">
           <p className="text-sm">
-            Your data is ready! Click &quot;Generate Analysis&quot; to get your
-            AI-powered health check and recommendations.
+            Your data clears the minimum bar. You can generate analysis now.
           </p>
+          {assessment.suggestedNextSteps.length > 0 && (
+            <ul className="list-disc pl-5 text-sm text-muted-foreground">
+              {assessment.suggestedNextSteps.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          )}
         </div>
       )}
     </div>

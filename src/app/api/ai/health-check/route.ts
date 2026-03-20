@@ -2,6 +2,9 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { generateHealthCheck } from "@/lib/ai/pipeline";
 
+// Location analysis adds several Gemini calls; allow more time
+export const maxDuration = 120; // seconds
+
 export async function POST(request: Request) {
   try {
     const supabase = await createClient();

@@ -1,18 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CsvUpload } from "@/components/shared/csv-upload";
-import { parseMetricsCSV, CSV_TEMPLATES } from "@/lib/csv/parse";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, CalendarDays, Loader2 } from "lucide-react";
 import type { BusinessMetricInput } from "@/lib/validators/schemas";
 
 interface Props {
   data: BusinessMetricInput[];
   onChange: (data: BusinessMetricInput[]) => void;
+  /** When provided, shows "Auto-fill from Daily Sales" button */
+  restaurantId?: string | null;
 }
 
 const emptyMetric: BusinessMetricInput = {
@@ -27,22 +26,8 @@ const emptyMetric: BusinessMetricInput = {
   delivery_share: null,
 };
 
-export function MetricsStep({ data, onChange }: Props) {
-  const [csvErrors, setCsvErrors] = useState<string[]>([]);
-
-  const handleCsvUpload = async (file: File) => {
-    const result = await parseMetricsCSV(file);
-    if (result.errors.length > 0) {
-      setCsvErrors(
-        result.errors.map((e) => `Row ${e.row}: ${e.message}`)
-      );
-    } else {
-      setCsvErrors([]);
-    }
-    if (result.data.length > 0) {
-      onChange(result.data);
-    }
-  };
+export function MetricsStep({ data, onChange, restaurantId }: Props) {
+  const [autoFilling, setAutoFilling] = useState<number | null>(null);
 
   const addPeriod = () => onChange([...data, { ...emptyMetric }]);
   const removePeriod = (index: number) =>
@@ -65,53 +50,85 @@ export function MetricsStep({ data, onChange }: Props) {
     onChange(updated);
   };
 
+  const autoFillFromDailySales = useCallback(
+    async (index: number) => {
+      const metric = data[index];
+      if (!restaurantId || !metric.period_start || !metric.period_end) return;
+
+      setAutoFilling(index);
+      try {
+        const params = new URLSearchParams({
+          restaurantId,
+          start: metric.period_start,
+          end: metric.period_end,
+        });
+        const res = await fetch(`/api/data/daily-sales-summary?${params}`);
+        const json = await res.json();
+
+        if (res.ok && json.orders > 0) {
+          const updated = [...data];
+          updated[index] = {
+            ...updated[index],
+            revenue: json.revenue,
+            orders: json.orders,
+            avg_order_value: json.avg_order_value,
+          };
+          onChange(updated);
+        }
+      } catch (err) {
+        console.error("Auto-fill failed:", err);
+      }
+      setAutoFilling(null);
+    },
+    [data, onChange, restaurantId]
+  );
+
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold">Business Metrics</h2>
+        <h2 className="text-2xl font-bold">Cost and Revenue</h2>
         <p className="text-muted-foreground">
           Enter your weekly or monthly financial data. More periods = better
           analysis.
         </p>
       </div>
 
-      <Tabs defaultValue="manual">
-        <TabsList>
-          <TabsTrigger value="manual">Manual Entry</TabsTrigger>
-          <TabsTrigger value="csv">CSV Upload</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="csv" className="mt-4">
-          <CsvUpload
-            onFileSelect={handleCsvUpload}
-            templateCsv={CSV_TEMPLATES.metrics}
-            templateName="metrics"
-          />
-          {csvErrors.length > 0 && (
-            <div className="mt-3 space-y-1">
-              {csvErrors.map((err, i) => (
-                <p key={i} className="text-sm text-destructive">
-                  {err}
-                </p>
-              ))}
-            </div>
-          )}
-        </TabsContent>
-
-        <TabsContent value="manual" className="mt-4 space-y-6">
+      <div className="space-y-6">
           {data.map((metric, index) => (
             <div key={index} className="rounded-lg border p-4">
               <div className="mb-3 flex items-center justify-between">
                 <h3 className="text-sm font-medium">Period {index + 1}</h3>
-                {data.length > 1 && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => removePeriod(index)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                )}
+                <div className="flex items-center gap-2">
+                  {/* Auto-fill button — only in data workspace, when dates are set */}
+                  {restaurantId &&
+                    metric.period_start &&
+                    metric.period_end && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="gap-1.5 text-xs"
+                        onClick={() => autoFillFromDailySales(index)}
+                        disabled={autoFilling === index}
+                      >
+                        {autoFilling === index ? (
+                          <Loader2 className="h-3 w-3 animate-spin" />
+                        ) : (
+                          <CalendarDays className="h-3 w-3" />
+                        )}
+                        Auto-fill from Daily Sales
+                      </Button>
+                    )}
+                  {data.length > 1 && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => removePeriod(index)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
               </div>
               <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
                 <div className="space-y-1">
@@ -217,8 +234,7 @@ export function MetricsStep({ data, onChange }: Props) {
           <Button variant="outline" onClick={addPeriod} className="gap-2">
             <Plus className="h-4 w-4" /> Add Period
           </Button>
-        </TabsContent>
-      </Tabs>
+      </div>
 
       {data.length > 0 && data[0].period_start && (
         <p className="text-sm text-muted-foreground">

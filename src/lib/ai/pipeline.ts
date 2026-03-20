@@ -5,12 +5,16 @@ import {
   buildHealthCheckUserPrompt,
 } from "./prompts";
 import { healthCheckResponseSchema } from "@/lib/validators/schemas";
+import { generateLocationAnalysis } from "./location-analysis";
 import type {
   Restaurant,
   BusinessMetric,
   MenuItem,
   Review,
   HealthCheckResponse,
+  CompetitorAnalysis,
+  TargetCustomerAnalysis,
+  SupplyRecommendation,
 } from "@/types";
 
 export async function generateHealthCheck(restaurantId: string) {
@@ -47,9 +51,32 @@ export async function generateHealthCheck(restaurantId: string) {
 
   if (!restaurant) throw new Error("Restaurant not found");
 
-  const systemPrompt = buildHealthCheckSystemPrompt();
+  const rest = restaurant as Restaurant;
+  const hasLocation = rest.latitude && rest.longitude;
+
+  // Run location analysis first if coordinates are available
+  // This is optional — if it fails, we still generate the health check
+  let locationData: {
+    competition: CompetitorAnalysis;
+    targetCustomers: TargetCustomerAnalysis;
+    localSupply: SupplyRecommendation;
+  } | null = null;
+
+  if (hasLocation) {
+    try {
+      locationData = await generateLocationAnalysis(restaurantId);
+    } catch (err) {
+      console.error("Location analysis failed (non-fatal):", err);
+    }
+  }
+
+  // Build prompts — include location context for better recommendations
+  const systemPrompt = buildHealthCheckSystemPrompt(
+    locationData?.competition,
+    locationData?.targetCustomers
+  );
   const userPrompt = buildHealthCheckUserPrompt(
-    restaurant as Restaurant,
+    rest,
     (metrics ?? []) as BusinessMetric[],
     (menuItems ?? []) as MenuItem[],
     (reviews ?? []) as Review[]
@@ -65,18 +92,30 @@ export async function generateHealthCheck(restaurantId: string) {
     }
   );
 
-  // Save report
+  // Save report — include location analysis in summary if available
+  const summary: Record<string, unknown> = {
+    revenue: healthCheck.revenue,
+    margin: healthCheck.margin,
+    menu: healthCheck.menu,
+    sentiment: healthCheck.sentiment,
+  };
+
+  if (locationData?.competition) {
+    summary.competition = locationData.competition;
+  }
+  if (locationData?.targetCustomers) {
+    summary.target_customers = locationData.targetCustomers;
+  }
+  if (locationData?.localSupply) {
+    summary.local_supply = locationData.localSupply;
+  }
+
   const { data: report, error: reportErr } = await supabase
     .from("reports")
     .insert({
       restaurant_id: restaurantId,
       report_type: "health_check",
-      summary: {
-        revenue: healthCheck.revenue,
-        margin: healthCheck.margin,
-        menu: healthCheck.menu,
-        sentiment: healthCheck.sentiment,
-      },
+      summary,
       risks: healthCheck.risks,
       opportunities: healthCheck.opportunities,
     })
@@ -98,6 +137,7 @@ export async function generateHealthCheck(restaurantId: string) {
         priority: rec.priority,
         effort: rec.effort,
         impact: rec.impact,
+        data_source: rec.data_source,
         status: "not_started",
       }))
     );
