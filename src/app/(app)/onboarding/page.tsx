@@ -118,7 +118,11 @@ export default function OnboardingPage() {
           location: data.restaurant.location || null,
           latitude: data.restaurant.latitude,
           longitude: data.restaurant.longitude,
-          service_model: data.restaurant.service_model,
+          service_model: (() => {
+            const parts = data.restaurant.service_model.split(",").filter(Boolean);
+            if (parts.length >= 3) return "hybrid";
+            return parts[0] || "dine_in";
+          })(),
           seats: data.restaurant.seats,
           hours: data.restaurant.hours || null,
         })

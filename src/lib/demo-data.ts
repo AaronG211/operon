@@ -27,7 +27,7 @@ export const demoRestaurant: OnboardingData["restaurant"] = {
   location: "6315 Delmar Blvd, University City, MO 63130",
   latitude: 38.6599,
   longitude: -90.3015,
-  service_model: "hybrid",
+  service_model: "dine_in,takeout,delivery",
   seats: 45,
   hours:
     "Mon: 11:00AM-9:30PM; Tue: 11:00AM-9:30PM; Wed: 11:00AM-9:30PM; Thu: 11:00AM-10:00PM; Fri: 11:00AM-10:30PM; Sat: 11:30AM-10:30PM; Sun: 11:30AM-9:00PM",
