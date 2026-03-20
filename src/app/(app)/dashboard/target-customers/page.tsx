@@ -52,7 +52,7 @@ export default function TargetCustomersPage() {
   if (!targetCustomers) {
     return (
       <div className="space-y-4">
-        <Button variant="ghost" onClick={() => router.back()} className="gap-2">
+        <Button variant="ghost" onClick={() => router.push("/dashboard")} className="gap-2">
           <ArrowLeft className="h-4 w-4" />
           Back to Dashboard
         </Button>
@@ -65,7 +65,7 @@ export default function TargetCustomersPage() {
 
   return (
     <div className="mx-auto max-w-4xl space-y-4">
-      <Button variant="ghost" onClick={() => router.back()} className="gap-2">
+      <Button variant="ghost" onClick={() => router.push("/dashboard")} className="gap-2">
         <ArrowLeft className="h-4 w-4" />
         Back to Dashboard
       </Button>
