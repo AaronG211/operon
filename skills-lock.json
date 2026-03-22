@@ -10,6 +10,11 @@
       "source": "pbakaus/impeccable",
       "sourceType": "github",
       "computedHash": "2fdb896e8c902ef8ca5bb30afdf2b7e4ad63afab0213323484e3c03e9e73324a"
+    },
+    "gws-slides": {
+      "source": "googleworkspace/cli",
+      "sourceType": "github",
+      "computedHash": "0d6725cc124e0b3274167d8a20d02a0e4c40cc1a321d8c94812aa4a4b06cea54"
     }
   }
 }

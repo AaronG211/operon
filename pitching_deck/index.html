@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Operon — Pitch Deck</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- ─── Progress Bar ─── -->
+  <div class="progress-bar" id="progressBar"></div>
+
+  <!-- ─── Navigation ─── -->
+  <nav class="deck-nav" id="deckNav">
+    <div class="nav-brand">OPERON</div>
+    <div class="nav-controls">
+      <button class="nav-btn" id="prevBtn" onclick="prevSlide()" aria-label="Previous slide">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <span class="slide-counter" id="slideCounter">1 / 11</span>
+      <button class="nav-btn" id="nextBtn" onclick="nextSlide()" aria-label="Next slide">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ─── Slide Container ─── -->
+  <div class="slides-wrapper" id="slidesWrapper">
+
+    <!-- ═══ SLIDE 1: Hook / Intro ═══ -->
+    <section class="slide slide-1" data-slide="0">
+      <div class="slide-bg">
+        <div class="bg-orb orb-1"></div>
+        <div class="bg-orb orb-2"></div>
+        <div class="bg-orb orb-3"></div>
+        <div class="particle-field" id="particleField1"></div>
+      </div>
+      <div class="slide-content center-content">
+        <div class="anim-item" data-delay="0.2">
+          <p class="hook-quote">"What if you could hire a business consultant who knows every line of your data, works around the clock, and costs less than a single menu item?"</p>
+        </div>
+        <div class="anim-item" data-delay="0.6">
+          <h1 class="brand-title">OPERON</h1>
+        </div>
+        <div class="anim-item" data-delay="0.9">
+          <p class="brand-subtitle">Your AI Restaurant Consultant. On Demand.</p>
+        </div>
+        <div class="anim-item" data-delay="1.2">
+          <div class="scroll-hint">
+            <span>Press <kbd>→</kbd> or click to continue</span>
+            <svg class="bounce-arrow" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ SLIDE 2: The Problem ═══ -->
+    <section class="slide slide-2" data-slide="1">
+      <div class="slide-bg">
+        <div class="bg-orb orb-1 orb-red"></div>
+        <div class="bg-orb orb-2 orb-amber"></div>
+      </div>
+      <div class="slide-content">
+        <div class="slide-header anim-item" data-delay="0.1">
+          <span class="slide-badge">The Problem</span>
+          <h2 class="slide-title">Restaurants Are<br /><span class="gradient-text">Drowning in Data</span></h2>
+        </div>
+        <div class="problem-grid">
+          <div class="problem-card anim-item card-3d" data-delay="0.3">
+            <div class="card-inner">
+              <div class="problem-icon">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 7V4h16v3M9 20h6M12 4v16"/></svg>
+              </div>
+              <h3>Data Scattered Everywhere</h3>
+              <p>POS systems, spreadsheets, Google reviews, Yelp, DoorDash — data lives in 5+ platforms with no unified view.</p>
+            </div>
+          </div>
+          <div class="problem-card anim-item card-3d" data-delay="0.45">
+            <div class="card-inner">
+              <div class="problem-icon icon-red">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              </div>
+              <h3>Consultants Cost $5K+/mo</h3>
+              <p>Professional business consulting is priced for chains with 50+ locations, not the independent operator.</p>
+            </div>
+          </div>
+          <div class="problem-card anim-item card-3d" data-delay="0.6">
+            <div class="card-inner">
+              <div class="problem-icon icon-amber">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"/></svg>
+              </div>
+              <h3>60% Fail in Year One</h3>
+              <p>Bad decisions accelerate failure. Most owners don't know what's wrong until it's too late to fix it.</p>
+            </div>
+          </div>
+          <div class="problem-card anim-item card-3d" data-delay="0.75">
+            <div class="card-inner">
+              <div class="problem-icon icon-gray">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+              </div>
+              <h3>No Actionable Insights</h3>
+              <p>Owners know something is wrong but can't pinpoint what. They're data-rich and insight-poor.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ SLIDE 3: The Solution ═══ -->
+    <section class="slide slide-3" data-slide="2">
+      <div class="slide-bg">
+        <div class="bg-orb orb-1"></div>
+        <div class="bg-orb orb-2"></div>
+      </div>
+      <div class="slide-content center-content">
+        <div class="anim-item" data-delay="0.1">
+          <span class="slide-badge">The Solution</span>
+        </div>
+        <div class="anim-item" data-delay="0.3">
+          <h2 class="slide-title mega-title">Meet <span class="gradient-text">Operon</span></h2>
+        </div>
+        <div class="anim-item" data-delay="0.5">
+          <p class="solution-subtitle">AI-powered consulting built for independent restaurant owners.<br />Upload your data, and get business intelligence that used to cost thousands a month.</p>
+        </div>
+        <div class="solution-flow anim-item" data-delay="0.7">
+          <div class="flow-step card-3d">
+            <div class="card-inner">
+              <div class="flow-icon">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+              </div>
+              <h4>Upload Data</h4>
+              <p>Menu, reviews, costs</p>
+            </div>
+          </div>
+          <div class="flow-arrow">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </div>
+          <div class="flow-step card-3d">
+            <div class="card-inner">
+              <div class="flow-icon">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+              </div>
+              <h4>AI Analyzes</h4>
+              <p>Cross-references everything</p>
+            </div>
+          </div>
+          <div class="flow-arrow">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </div>
+          <div class="flow-step card-3d">
+            <div class="card-inner">
+              <div class="flow-icon">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              </div>
+              <h4>Get Playbook</h4>
+              <p>Prioritized actions</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ SLIDE 4: Data Upload ═══ -->
+    <section class="slide slide-4" data-slide="3">
+      <div class="slide-bg">
+        <div class="bg-orb orb-1"></div>
+        <div class="bg-orb orb-2 orb-teal"></div>
+      </div>
+      <div class="slide-content">
+        <div class="slide-header anim-item" data-delay="0.1">
+          <span class="slide-badge">Data Input</span>
+          <h2 class="slide-title">Feed Operon the Data<br /><span class="gradient-text">You Already Have</span></h2>
+          <p class="slide-subtitle-sm">No integrations. No APIs. Just the information sitting in your spreadsheets and review pages.</p>
+        </div>
+        <div class="data-grid">
+          <div class="data-card anim-item card-3d" data-delay="0.25">
+            <div class="card-inner">
+              <div class="data-card-icon">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+              </div>
+              <h3>Restaurant Profile</h3>
+              <p>Name, location, cuisine, hours, seating capacity, service model</p>
+              <div class="data-tag-row">
+                <span class="data-tag">Location</span>
+                <span class="data-tag">Cuisine</span>
+                <span class="data-tag">Hours</span>
+              </div>
+            </div>
+          </div>
+          <div class="data-card anim-item card-3d" data-delay="0.4">
+            <div class="card-inner">
+              <div class="data-card-icon icon-teal">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+              </div>
+              <h3>Menu & Pricing</h3>
+              <p>Full menu with item names, descriptions, prices, and categories</p>
+              <div class="data-tag-row">
+                <span class="data-tag">Items</span>
+                <span class="data-tag">Prices</span>
+                <span class="data-tag">Categories</span>
+              </div>
+            </div>
+          </div>
+          <div class="data-card anim-item card-3d" data-delay="0.55">
+            <div class="card-inner">
+              <div class="data-card-icon icon-amber">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+              </div>
+              <h3>Costs & Revenue</h3>
+              <p>Daily sales, food costs, labor costs, overhead — whatever you track</p>
+              <div class="data-tag-row">
+                <span class="data-tag">Revenue</span>
+                <span class="data-tag">COGS</span>
+                <span class="data-tag">Labor</span>
+              </div>
+            </div>
+          </div>
+          <div class="data-card anim-item card-3d" data-delay="0.7">
+            <div class="card-inner">
+              <div class="data-card-icon icon-violet">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+              </div>
+              <h3>Customer Reviews</h3>
+              <p>Reviews from Google, Yelp, or anywhere — paste them right in</p>
+              <div class="data-tag-row">
+                <span class="data-tag">Sentiment</span>
+                <span class="data-tag">Themes</span>
+                <span class="data-tag">Ratings</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="data-footer anim-item" data-delay="0.85">
+          <div class="data-footer-badge">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            <span>Don't have your data ready? Use our <strong>demo data</strong> to explore instantly.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ SLIDE 5: AI Analyzing ═══ -->
+    <section class="slide slide-5" data-slide="4">
+      <div class="slide-bg">
+        <div class="bg-orb orb-1"></div>
+        <div class="bg-orb orb-2"></div>
+      </div>
+      <div class="slide-content">
+        <div class="slide-header anim-item" data-delay="0.1">
+          <span class="slide-badge">How It Works</span>
+          <h2 class="slide-title">What Happens After<br /><span class="gradient-text">You Hit Submit</span></h2>
+          <p class="slide-subtitle-sm">Operon's AI reads all your data, connects the dots, and builds you a game plan.</p>
+        </div>
+        <div class="pipeline-grid">
+          <div class="pipeline-step anim-item card-3d" data-delay="0.25">
+            <div class="card-inner">
+              <div class="pipeline-num">01</div>
+              <div class="pipeline-body">
+                <h3>Clean & Organize</h3>
+                <p>Your raw data gets structured — menu items categorized, costs aligned by date, reviews sorted by theme.</p>
+                <div class="pipeline-tag">Data Normalization</div>
+              </div>
+            </div>
+          </div>
+          <div class="pipeline-step anim-item card-3d" data-delay="0.4">
+            <div class="card-inner">
+              <div class="pipeline-num">02</div>
+              <div class="pipeline-body">
+                <h3>Connect the Dots</h3>
+                <p>AI cross-references your menu prices, ingredient costs, and customer feedback to find patterns you'd never spot alone.</p>
+                <div class="pipeline-tag">Cross-Data Analysis</div>
+              </div>
+            </div>
+          </div>
+          <div class="pipeline-step anim-item card-3d" data-delay="0.55">
+            <div class="card-inner">
+              <div class="pipeline-num">03</div>
+              <div class="pipeline-body">
+                <h3>Read Your Reviews</h3>
+                <p>Every review is broken down by topic — food, service, ambiance, value — so you know exactly what customers love and hate.</p>
+                <div class="pipeline-tag">Sentiment Analysis</div>
+              </div>
+            </div>
+          </div>
+          <div class="pipeline-step anim-item card-3d" data-delay="0.7">
+            <div class="card-inner">
+              <div class="pipeline-num">04</div>
+              <div class="pipeline-body">
+                <h3>Build Your Playbook</h3>
+                <p>Everything gets ranked by impact and effort — you get a prioritized list of exactly what to do this week.</p>
+                <div class="pipeline-tag">Actionable Recommendations</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ SLIDE 6: Dashboard KPIs ═══ -->
+    <section class="slide slide-6" data-slide="5">
+      <div class="slide-bg">
+        <div class="bg-orb orb-1"></div>
+      </div>
+      <div class="slide-content">
+        <div class="slide-header anim-item" data-delay="0.1">
+          <span class="slide-badge">Product</span>
+          <h2 class="slide-title">Your Numbers,<br /><span class="gradient-text">At a Glance</span></h2>
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi-card anim-item card-3d" data-delay="0.3">
+            <div class="card-inner">
+              <div class="kpi-label">Avg Daily Revenue</div>
+              <div class="kpi-value" data-count="2847" data-prefix="$">$0</div>
+              <div class="kpi-change positive">+12% vs last week</div>
+            </div>
+          </div>
+          <div class="kpi-card anim-item card-3d" data-delay="0.4">
+            <div class="card-inner">
+              <div class="kpi-label">Order Volume</div>
+              <div class="kpi-value" data-count="156">0</div>
+              <div class="kpi-change positive">+8% vs last week</div>
+            </div>
+          </div>
+          <div class="kpi-card anim-item card-3d" data-delay="0.5">
+            <div class="card-inner">
+              <div class="kpi-label">Food Cost Ratio</div>
+              <div class="kpi-value" data-count="31.2" data-suffix="%" data-decimals="1">0%</div>
+              <div class="kpi-change negative">-2.1% vs last week</div>
+            </div>
+          </div>
+          <div class="kpi-card anim-item card-3d" data-delay="0.6">
+            <div class="card-inner">
+              <div class="kpi-label">Delivery Share</div>
+              <div class="kpi-value" data-count="24" data-suffix="%">0%</div>
+              <div class="kpi-change positive">+5% vs last week</div>
+            </div>
+          </div>
+        </div>
+        <div class="snapshot-section anim-item" data-delay="0.8">
+          <div class="snapshot-header">Executive Snapshot</div>
+          <div class="snapshot-grid">
+            <div class="snapshot-card card-3d">
+              <div class="card-inner">
+                <div class="health-ring" id="healthRing">
+                  <svg viewBox="0 0 120 120">
+                    <circle cx="60" cy="60" r="52" fill="none" stroke="rgba(0,0,0,0.06)" stroke-width="8" />
+                    <circle cx="60" cy="60" r="52" fill="none" stroke="url(#emeraldGrad)" stroke-width="8" stroke-linecap="round"
+                      stroke-dasharray="326.7" stroke-dashoffset="326.7" class="health-progress" />
+                    <defs>
+                      <linearGradient id="emeraldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#10b981" />
+                        <stop offset="100%" stop-color="#14b8a6" />
+                      </linearGradient>
+                    </defs>
+                  </svg>
+                  <span class="health-score">74</span>
+                </div>
+                <div class="snapshot-label">Health Score</div>
+              </div>
+            </div>
+            <div class="snapshot-card card-3d">
+              <div class="card-inner">
+                <div class="snapshot-icon icon-red">
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                </div>
+                <div class="snapshot-value">Food Cost Rising</div>
+                <div class="snapshot-desc">Beef brisket up 18%</div>
+                <div class="snapshot-label">Biggest Issue</div>
+              </div>
+            </div>
+            <div class="snapshot-card card-3d">
+              <div class="card-inner">
+                <div class="snapshot-icon icon-emerald">
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                </div>
+                <div class="snapshot-value">Menu Repricing</div>
+                <div class="snapshot-desc">3 items underpriced by $2–4</div>
+                <div class="snapshot-label">Biggest Opportunity</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ SLIDE 7: Deep Analysis ═══ -->
+    <section class="slide slide-7" data-slide="6">
+      <div class="slide-bg">
+        <div class="bg-orb orb-1"></div>
+        <div class="bg-orb orb-2"></div>
+      </div>
+      <div class="slide-content">
+        <div class="slide-header anim-item" data-delay="0.1">
+          <span class="slide-badge">Intelligence</span>
+          <h2 class="slide-title">Beyond Your<br /><span class="gradient-text">Four Walls</span></h2>
+        </div>
+        <div class="analysis-grid">
+          <div class="analysis-card anim-item card-3d" data-delay="0.3">
+            <div class="card-inner">
+              <div class="analysis-icon">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+              </div>
+              <h3>Competition Analysis</h3>
+              <p>Nearby restaurants, pricing gaps, and what makes you different. Know your market before your market knows you.</p>
+              <div class="analysis-stat">
+                <span class="stat-number">12</span>
+                <span class="stat-label">competitors analyzed</span>
+              </div>
+            </div>
+          </div>
+          <div class="analysis-card anim-item card-3d" data-delay="0.5">
+            <div class="card-inner">
+              <div class="analysis-icon icon-teal">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+              </div>
+              <h3>Target Customers</h3>
+              <p>Ideal segments, visit patterns, and what they're looking for that you're not yet offering.</p>
+              <div class="analysis-stat">
+                <span class="stat-number">4</span>
+                <span class="stat-label">segments identified</span>
+              </div>
+            </div>
+          </div>
+          <div class="analysis-card anim-item card-3d" data-delay="0.7">
+            <div class="card-inner">
+              <div class="analysis-icon icon-violet">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"/></svg>
+              </div>
+              <h3>Supply Chain Intelligence</h3>
+              <p>Better suppliers matched by AI. This restaurant saves <strong>$300+/week</strong> just by switching beef suppliers.</p>
+              <div class="analysis-stat savings">
+                <span class="stat-number">$312</span>
+                <span class="stat-label">saved per week</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ SLIDE 8: Health Report & Recommendations ═══ -->
+    <section class="slide slide-8" data-slide="7">
+      <div class="slide-bg">
+        <div class="bg-orb orb-1"></div>
+      </div>
+      <div class="slide-content">
+        <div class="slide-header anim-item" data-delay="0.1">
+          <span class="slide-badge">Recommendations</span>
+          <h2 class="slide-title">Specific Actions,<br /><span class="gradient-text">Not Generic Advice</span></h2>
+        </div>
+        <div class="reco-split">
+          <div class="reco-comparison anim-item" data-delay="0.3">
+            <div class="reco-bad card-3d">
+              <div class="card-inner">
+                <div class="reco-label bad-label">Generic Consultant</div>
+                <div class="reco-quote">"You should optimize your menu pricing and consider reducing food costs."</div>
+                <div class="reco-verdict">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="2"><path d="M6 18L18 6M6 6l12 12"/></svg>
+                  <span>Vague. Unhelpful. $5,000/month.</span>
+                </div>
+              </div>
+            </div>
+            <div class="reco-good card-3d">
+              <div class="card-inner">
+                <div class="reco-label good-label">Operon AI</div>
+                <div class="reco-quote">"Raise the price on Truffle Fries from $14 to $16. Your margin improves by 12% with minimal demand impact. Priority: High."</div>
+                <div class="reco-verdict good">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><path d="M5 13l4 4L19 7"/></svg>
+                  <span>Specific. Data-backed. Instant.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="reco-features anim-item" data-delay="0.6">
+            <div class="reco-feature-item">
+              <div class="feature-check">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><path d="M5 13l4 4L19 7"/></svg>
+              </div>
+              <span>Every recommendation ranked by impact & effort</span>
+            </div>
+            <div class="reco-feature-item">
+              <div class="feature-check">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><path d="M5 13l4 4L19 7"/></svg>
+              </div>
+              <span>Categories: Quick Wins, Operational, Strategic</span>
+            </div>
+            <div class="reco-feature-item">
+              <div class="feature-check">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><path d="M5 13l4 4L19 7"/></svg>
+              </div>
+              <span>Track progress: Not Started → In Progress → Done</span>
+            </div>
+            <div class="reco-feature-item">
+              <div class="feature-check">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><path d="M5 13l4 4L19 7"/></svg>
+              </div>
+              <span>Full risk & opportunity analysis included</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ SLIDE 9: AI Chat (Star Feature) ═══ -->
+    <section class="slide slide-9" data-slide="8">
+      <div class="slide-bg">
+        <div class="bg-orb orb-1 orb-teal"></div>
+        <div class="bg-orb orb-2"></div>
+      </div>
+      <div class="slide-content">
+        <div class="slide-header anim-item" data-delay="0.1">
+          <span class="slide-badge star-badge">&#9733; Star Feature</span>
+          <h2 class="slide-title">Ask Anything.<br /><span class="gradient-text">Get Real Answers.</span></h2>
+        </div>
+        <div class="chat-demo anim-item" data-delay="0.4">
+          <div class="chat-window card-3d">
+            <div class="card-inner">
+              <div class="chat-header-bar">
+                <div class="chat-dot"></div>
+                <div class="chat-dot"></div>
+                <div class="chat-dot"></div>
+                <span class="chat-title">Operon AI Consultant</span>
+              </div>
+              <div class="chat-messages" id="chatMessages">
+                <div class="chat-msg user-msg" data-chat-delay="0.5">
+                  <div class="msg-bubble user-bubble">What's causing my food cost to rise?</div>
+                </div>
+                <div class="chat-msg ai-msg" data-chat-delay="1.2">
+                  <div class="msg-avatar">AI</div>
+                  <div class="msg-bubble ai-bubble">
+                    Your <strong>beef brisket</strong> cost increased <strong>18%</strong> last month — from $4.20/lb to $4.96/lb. This single item accounts for 34% of your total food cost increase.
+                    <br /><br />
+                    <strong>Recommendation:</strong> Switch to Supplier B ($2.40/lb savings). Estimated weekly savings: <span class="highlight-num">$312</span>.
+                  </div>
+                </div>
+                <div class="chat-msg user-msg" data-chat-delay="2.5">
+                  <div class="msg-bubble user-bubble">How should I reprice my menu?</div>
+                </div>
+                <div class="chat-msg ai-msg" data-chat-delay="3.2">
+                  <div class="msg-avatar">AI</div>
+                  <div class="msg-bubble ai-bubble">
+                    Based on your margins and competitor pricing:<br />
+                    &bull; <strong>Truffle Fries:</strong> $14 → $16 (+12% margin, minimal demand impact)<br />
+                    &bull; <strong>Lobster Roll:</strong> $22 → $25 (+8% margin)<br />
+                    &bull; <strong>House Salad:</strong> Keep at $11 (already competitive)
+                  </div>
+                </div>
+              </div>
+              <div class="chat-input-bar">
+                <span class="chat-placeholder">Ask about your business...</span>
+                <div class="chat-send">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="chat-tagline anim-item" data-delay="0.7">
+          <p>Grounded in <strong>your data</strong> &bull; Available <strong>24/7</strong> &bull; Never calls in sick</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ SLIDE 10: Market Opportunity ═══ -->
+    <section class="slide slide-10" data-slide="9">
+      <div class="slide-bg">
+        <div class="bg-orb orb-1"></div>
+        <div class="bg-orb orb-2 orb-teal"></div>
+      </div>
+      <div class="slide-content">
+        <div class="slide-header anim-item" data-delay="0.1">
+          <span class="slide-badge">Market</span>
+          <h2 class="slide-title">A Massive,<br /><span class="gradient-text">Underserved Market</span></h2>
+        </div>
+        <div class="market-stats">
+          <div class="market-card anim-item card-3d" data-delay="0.3">
+            <div class="card-inner">
+              <div class="market-number" data-count="1" data-suffix="M+">0</div>
+              <div class="market-label">Independent Restaurants<br />in the US</div>
+              <div class="market-bar"><div class="bar-fill" data-width="85"></div></div>
+            </div>
+          </div>
+          <div class="market-card anim-item card-3d" data-delay="0.5">
+            <div class="card-inner">
+              <div class="market-number" data-count="800" data-prefix="$" data-suffix="B+">$0</div>
+              <div class="market-label">US Restaurant<br />Industry Size</div>
+              <div class="market-bar"><div class="bar-fill" data-width="100"></div></div>
+            </div>
+          </div>
+          <div class="market-card anim-item card-3d" data-delay="0.7">
+            <div class="card-inner">
+              <div class="market-number" data-count="5" data-prefix="<" data-suffix="%">0</div>
+              <div class="market-label">Have Access to Data-<br />Driven Consulting</div>
+              <div class="market-bar bar-red"><div class="bar-fill" data-width="5"></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="market-expansion anim-item" data-delay="0.9">
+          <div class="expansion-text">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><path d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9"/></svg>
+            <span>Starting with restaurants. <strong>Expanding to all SMB verticals.</strong></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ SLIDE 11: Closing / CTA ═══ -->
+    <section class="slide slide-11" data-slide="10">
+      <div class="slide-bg">
+        <div class="bg-orb orb-1 orb-large"></div>
+        <div class="bg-orb orb-2 orb-large"></div>
+        <div class="bg-orb orb-3 orb-teal"></div>
+        <div class="particle-field" id="particleField10"></div>
+      </div>
+      <div class="slide-content center-content">
+        <div class="anim-item" data-delay="0.2">
+          <h2 class="closing-title">Stop Guessing.<br /><span class="gradient-text">Start Growing.</span></h2>
+        </div>
+        <div class="anim-item" data-delay="0.5">
+          <p class="closing-subtitle">An AI consultant that works 24/7, never takes a day off,<br />and pays for itself with the first insight.</p>
+        </div>
+        <div class="anim-item" data-delay="0.8">
+          <h1 class="brand-title closing-brand">OPERON</h1>
+        </div>
+        <div class="anim-item" data-delay="1.0">
+          <a href="https://operon-phi.vercel.app/" target="_blank" class="cta-button">
+            <span>Visit Website</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+        </div>
+        <div class="anim-item" data-delay="1.2">
+          <p class="trust-text">operon-phi.vercel.app</p>
+        </div>
+      </div>
+      <div class="closing-bar"></div>
+    </section>
+
+  </div>
+
+  <script src="deck.js"></script>
+</body>
+</html>
